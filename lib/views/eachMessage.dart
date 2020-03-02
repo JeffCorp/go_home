@@ -5,35 +5,28 @@ class EachMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return CustomScrollView(
-      slivers: <Widget>[
-        SliverAppBar(
-          pinned: true,
-          expandedHeight: 160.0,
-          backgroundColor: Color(0xFF79c942),
-          flexibleSpace: FlexibleSpaceBar(
-              title: Text('Message'),
-              background: Image(
-                image: AssetImage("assets/abuja.jpg"),
-                fit: BoxFit.cover,
-              )),
+    return SafeArea(
+      child: Scaffold(
+        body: Flex(
+          direction: Axis.vertical,
+          children: <Widget>[
+            Flexible(
+              flex: 5,
+              child: Container(
+                color: Colors.red,
+                child: Column(),
+              ),
+            ),
+            Flexible(
+              flex: 1,
+              child: Container(
+                color: Colors.grey,
+                child: Column(),
+              ),
+            ),
+          ],
         ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              return Container(
-                height: MediaQuery.of(context).size.height,
-                color: Colors.white,
-                child: Column(
-                  children: <Widget>[
-                    
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

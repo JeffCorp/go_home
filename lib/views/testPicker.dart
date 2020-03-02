@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+// import 'package:flutter_multiple_image_picker/flutter_multiple_image_picker.dart';
 import 'dart:io';
 
 class TestPicker extends StatefulWidget {
@@ -8,57 +9,88 @@ class TestPicker extends StatefulWidget {
 }
 
 class _TestPickerState extends State<TestPicker> {
-  File _image;
+  BuildContext context;
+  String _platformMessage = 'No Error';
+  List images;
+  int maxImageNo = 10;
+  bool selectSingleImage = false;
 
-  Future getImage() async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      _image = image;
-    });
-  }
-
-  Future<void> retrieveLostData() async {
-  final LostDataResponse response =
-      await ImagePicker.retrieveLostData();
-  if (response == null) {
-    return;
-  }
-  if (response.file != null) {
-    setState(() {
-      if (response.type == RetrieveType.video) {
-        // _handleVideo(response.file);
-      } else {
-        // _handleImage(response.file);
-      }
-    });
-  } else {
-    // _handleError(response.exception);
-  }
-}
-
-@override
-  void initState() {
-    // TODO: implement initState
+  @override
+  initState() {
     super.initState();
-    retrieveLostData();
+  }
+
+  initMultiPickUp() async {
+    setState(() {
+      images = null;
+      _platformMessage = 'No Error';
+    });
+    List resultList;
+    String error;
+    // try {
+    //   resultList = await FlutterMultipleImagePicker.pickMultiImages(
+    //       maxImageNo, selectSingleImage);
+    // } on Exception catch (e) {
+    //   error = e.toString();
+    // }
+
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+      if (error == null) _platformMessage = 'No Error Dectected';
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Image Picker Example'),
-      ),
-      body: Center(
-        child: _image == null
-            ? Text('No image selected.')
-            : Image.file(_image),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: getImage,
-        tooltip: 'Pick Image',
-        child: Icon(Icons.add_a_photo),
+    return new MaterialApp(
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: new Text('Multi-image picker plugin'),
+        ),
+        body: new Container(
+          padding: const EdgeInsets.all(8.0),
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              images == null
+                  ? new Container(
+                      height: 300.0,
+                      width: 400.0,
+                      child: new Icon(
+                        Icons.image,
+                        size: 250.0,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    )
+                  : new SizedBox(
+                      height: 300.0,
+                      width: 400.0,
+                      child: new ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (BuildContext context, int index) =>
+                            new Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: new Image.file(
+                                new File(images[index].toString()),
+                              ),
+                            ),
+                        itemCount: images.length,
+                      ),
+                    ),
+              new Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: new Text('Error Dectected: $_platformMessage'),
+              ),
+              new RaisedButton.icon(
+                  onPressed: initMultiPickUp,
+                  icon: new Icon(Icons.image),
+                  label: new Text("Pick-Up Images")),
+            ],
+          ),
+        ),
       ),
     );
   }

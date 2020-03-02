@@ -18,7 +18,8 @@ class EachRequest extends StatefulWidget {
   EachRequest({this.title, this.propId});
 
   @override
-  State<StatefulWidget> createState() => _EachRequestState(title: title, propId: propId);
+  State<StatefulWidget> createState() =>
+      _EachRequestState(title: title, propId: propId);
 }
 
 class _EachRequestState extends State<EachRequest> {
@@ -44,8 +45,6 @@ class _EachRequestState extends State<EachRequest> {
     print("Prop: " + propId);
   }
 
-  
-
   getData() async {
     return this._memoizer.runOnce(() async {
       SharedPreferences shared_User = await SharedPreferences.getInstance();
@@ -59,11 +58,15 @@ class _EachRequestState extends State<EachRequest> {
       if (isAuthenticated) {
         response = await http.get(
             Uri.encodeFull(
-                "http://www.gohome.ng/api/get_property_message.php?receiver_id=" + user[0] + "&prop_id=$propId"),
+                "http://www.gohome.ng/api/get_property_message.php?receiver_id=" +
+                    user[0] +
+                    "&prop_id=$propId"),
             headers: {"Accept": "application/json"});
         List userData;
         print(userData);
-        print("http://www.gohome.ng/api/get_property_message.php?receiver_id=" + user[0] + "&prop_id=$propId");
+        print("http://www.gohome.ng/api/get_property_message.php?receiver_id=" +
+            user[0] +
+            "&prop_id=$propId");
         userData = json.decode(response.body);
 
         // Message messages =Message.fromJson(response.body);
@@ -125,127 +128,109 @@ class _EachRequestState extends State<EachRequest> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return SafeArea(
-      child: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 160.0,
-            backgroundColor: Color(0xFF79c942),
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.only(left: 40),
-              title: Text(
-                title.length > 20 ? title.substring(0, 20) + "..." : title,
-              ),
-              background: Image(
-                image: AssetImage("assets/abuja.jpg"),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return Container(
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.white,
-                  child: Column(
-                    children: <Widget>[
-                      isAuth
-                          ? Container(
-                              margin: EdgeInsets.only(top: 20),
-                              child: new FutureBuilder(
-                                future: getData(),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData && _current > 0) {
-                                    return Center(
-                                      child: CircularProgressIndicator(),
-                                    );
-                                  } else if (!snapshot.hasData &&
-                                      _current == 0) {
-                                    return Column(
-                                      children: <Widget>[
-                                        Container(
-                                          margin: EdgeInsets.only(top: 250),
-                                          child: Icon(
-                                            Icons.priority_high,
-                                            size: 40,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        Container(
-                                          child: Text(
-                                            "You don't have any messages!!!",
-                                            style: TextStyle(fontSize: 20),
-                                          ),
-                                        )
-                                      ],
-                                    );
-                                  } else {
-                                    var myData = snapshot.data;
-                                    return ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: ClampingScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        final item = myData[index];
-                                        return GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    EachMessage(),
-                                              ),
-                                            );
-                                          },
-                                          child: InspectionView(
-                                            id: item["id"],
-                                            title: item["sender_name"],
-                                            requestQuestion: item["title"],
-                                            followUp: item["message"],
-                                          ),
-                                        );
-                                      },
-                                      itemCount: myData.length,
-                                    );
-                                  }
-                                },
-                              ),
-                            )
-                          : Container(
-                              margin: EdgeInsets.only(top: 200),
-                              child: Column(
-                                children: <Widget>[
-                                  Text(
-                                    "You are not logged in!!!",
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  Container(
-                                    child: MaterialButton(
-                                      child: Text(
-                                        "Login",
-                                        style: TextStyle(color: Colors.white),
+      child: Scaffold(
+        appBar: AppBar(title: Text(title),),
+        body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height,
+              color: Colors.white,
+              child: Column(
+                children: <Widget>[
+                  isAuth
+                      ? Container(
+                          margin: EdgeInsets.only(top: 20),
+                          child: new FutureBuilder(
+                            future: getData(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData && _current > 0) {
+                                return Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (!snapshot.hasData && _current == 0) {
+                                return Column(
+                                  children: <Widget>[
+                                    Container(
+                                      margin: EdgeInsets.only(top: 250),
+                                      child: Icon(
+                                        Icons.priority_high,
+                                        size: 40,
+                                        color: Colors.red,
                                       ),
-                                      color: Color(0xFF79c942),
-                                      onPressed: () {
+                                    ),
+                                    Container(
+                                      child: Text(
+                                        "You don't have any messages!!!",
+                                        style: TextStyle(fontSize: 20),
+                                      ),
+                                    )
+                                  ],
+                                );
+                              } else {
+                                var myData = snapshot.data;
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: ClampingScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    final item = myData[index];
+                                    return GestureDetector(
+                                      onTap: () {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => Login(),
+                                            builder: (context) => EachMessage(),
                                           ),
                                         );
                                       },
-                                    ),
-                                  )
-                                ],
+                                      child: InspectionView(
+                                        id: item["id"],
+                                        title: item["sender_name"],
+                                        requestQuestion: item["title"],
+                                        followUp: item["message"],
+                                      ),
+                                    );
+                                  },
+                                  itemCount: myData.length,
+                                );
+                              }
+                            },
+                          ),
+                        )
+                      : Container(
+                          margin: EdgeInsets.only(top: 200),
+                          child: Column(
+                            children: <Widget>[
+                              Text(
+                                "You are not logged in!!!",
+                                style: TextStyle(fontSize: 20),
                               ),
-                            ),
-                    ],
-                  ),
-                );
-              },
+                              Container(
+                                child: MaterialButton(
+                                  child: Text(
+                                    "Login",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  color: Color(0xFF79c942),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Login(),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
       ),
     );
   }

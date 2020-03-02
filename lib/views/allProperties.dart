@@ -54,6 +54,8 @@ class _AllPropertiesState extends State<AllProperties> {
 
   TextEditingController bathroomController =TextEditingController();
   TextEditingController bedroomController =TextEditingController();
+  TextEditingController minController =TextEditingController();
+  TextEditingController maxController =TextEditingController();
 
   final snackBar = SnackBar(
     content: Text('Please set the filter'),
@@ -88,7 +90,7 @@ class _AllPropertiesState extends State<AllProperties> {
       return null;
   }
 
-  void filter() {
+   void filter() {
     setState(() {
       filteredProperties = properties
           .where((p) =>
@@ -98,11 +100,12 @@ class _AllPropertiesState extends State<AllProperties> {
               p.bedroom.contains(bedroomController.text) &&
               // int.parse(p.bathroom) == int.parse(bathroomValue)
               p.bathroom.contains(bathroomController.text) &&
-              int.parse(p.amount) > int.parse(minAmountValue) &&
-              int.parse(p.amount) < int.parse(maxAmountValue))
+              int.parse(p.amount) > int.parse(minController.text)&&
+              int.parse(p.amount) < int.parse(maxController.text))
           .toList();
     });
   }
+
 
   Future<void> refresh() async {
     setState(() {
@@ -383,6 +386,7 @@ class _AllPropertiesState extends State<AllProperties> {
                                   BorderRadius.all(Radius.circular(20))),
                           padding: EdgeInsets.all(10),
                           child: TextFormField(
+                            keyboardType: TextInputType.number,
                             controller: bedroomController,
                             decoration: InputDecoration(
                               hintText: "Bedrooms"
@@ -400,6 +404,7 @@ class _AllPropertiesState extends State<AllProperties> {
                                   BorderRadius.all(Radius.circular(20))),
                           padding: EdgeInsets.all(10),
                           child: TextFormField(
+                            keyboardType: TextInputType.number,
                             controller: bathroomController,
                             decoration: InputDecoration(
                               hintText: "Bathroom"
@@ -415,34 +420,13 @@ class _AllPropertiesState extends State<AllProperties> {
                               ),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          padding: EdgeInsets.all(5),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: minAmountValue,
-                            icon: Icon(Icons.arrow_drop_down),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: TextStyle(color: Colors.black),
-                            underline: Container(
-                              height: 0,
-                              color: Colors.black,
+                          padding: EdgeInsets.all(10),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: minController,
+                            decoration: InputDecoration(
+                              hintText: "Min Amount"
                             ),
-                            onChanged: (String newValue) {
-                              setState(() {
-                                minAmountValue = newValue;
-                              });
-                            },
-                            items: <String>[
-                              'Min Amount',
-                              '0',
-                              '10000',
-                              '100000'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
                           ),
                         ),
                         Container(
@@ -456,35 +440,13 @@ class _AllPropertiesState extends State<AllProperties> {
                               Radius.circular(20),
                             ),
                           ),
-                          padding: EdgeInsets.all(5),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: maxAmountValue,
-                            icon: Icon(Icons.arrow_drop_down),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: TextStyle(color: Colors.black),
-                            underline: Container(
-                              height: 0,
-                              color: Colors.black,
+                          padding: EdgeInsets.all(10),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: maxController,
+                            decoration: InputDecoration(
+                              hintText: "Max Amount"
                             ),
-                            items: <String>[
-                              'Max Amount',
-                              '1000',
-                              '10000',
-                              '100000'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String newValue) {
-                              maxAmountValue = newValue;
-                              setState(() {
-                                maxAmountValue = newValue;
-                              });
-                            },
                           ),
                         ),
                         MaterialButton(

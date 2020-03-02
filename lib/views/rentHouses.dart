@@ -25,6 +25,12 @@ class _RentHousesState extends State<RentHouses> {
   String minAmountValue = "Min Amount";
   String maxAmountValue = "Max Amount";
 
+   TextEditingController bathroomController =TextEditingController();
+  TextEditingController bedroomController =TextEditingController();
+
+  TextEditingController minController =TextEditingController();
+  TextEditingController maxController =TextEditingController();
+
   String number = "5";
 
   bool isButtonDisabled;
@@ -51,11 +57,11 @@ class _RentHousesState extends State<RentHouses> {
               p.state.toLowerCase().contains(regionValue.toLowerCase()) &&
               p.propType.toLowerCase().contains(typeValue.toLowerCase()) &&
               p.status.toLowerCase().contains(statusValue.toLowerCase()) &&
-              p.bedroom.contains(bedroomValue) && 
+              p.bedroom.contains(bedroomController.text) &&
               // int.parse(p.bathroom) == int.parse(bathroomValue)
-              p.bathroom.contains(bathroomValue) &&
-              int.parse(p.amount) > int.parse(minAmountValue) &&
-              int.parse(p.amount) < int.parse(maxAmountValue))
+              p.bathroom.contains(bathroomController.text) &&
+              int.parse(p.amount) > int.parse(minController.text)&&
+              int.parse(p.amount) < int.parse(maxController.text))
           .toList();
     });
   }
@@ -141,7 +147,7 @@ class _RentHousesState extends State<RentHouses> {
     );
   }
 
-  void _settingModalBottomSheet(context) {
+ void _settingModalBottomSheet(context) {
     print(typeValue);
     showModalBottomSheet(
         context: context,
@@ -321,30 +327,31 @@ class _RentHousesState extends State<RentHouses> {
                               ),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          padding: EdgeInsets.all(5),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: bedroomValue,
-                            icon: Icon(Icons.arrow_drop_down),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: TextStyle(color: Colors.black),
-                            underline: Container(
-                              height: 0,
-                              color: Colors.black,
+                          padding: EdgeInsets.all(10),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: bedroomController,
+                            decoration: InputDecoration(
+                              hintText: "Bedrooms"
                             ),
-                            onChanged: (String newValue) {
-                              setState(() {
-                                bedroomValue = newValue;
-                              });
-                            },
-                            items: <String>['Bedrooms', '1', '2', '3']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
+                          )
+                        ),
+                        Container(
+                          margin: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 1,
+                                color: Colors.black45,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20))),
+                          padding: EdgeInsets.all(10),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: bathroomController,
+                            decoration: InputDecoration(
+                              hintText: "Bathroom"
+                            ),
                           ),
                         ),
                         Container(
@@ -356,69 +363,13 @@ class _RentHousesState extends State<RentHouses> {
                               ),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
-                          padding: EdgeInsets.all(5),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: bathroomValue,
-                            icon: Icon(Icons.arrow_drop_down),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: TextStyle(color: Colors.black),
-                            underline: Container(
-                              height: 0,
-                              color: Colors.black,
+                          padding: EdgeInsets.all(10),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: minController,
+                            decoration: InputDecoration(
+                              hintText: "Min Amount"
                             ),
-                            onChanged: (String newValue) {
-                              setState(() {
-                                bathroomValue = newValue;
-                              });
-                            },
-                            items: <String>['Bathrooms', '1', '2', '3']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 1,
-                                color: Colors.black45,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          padding: EdgeInsets.all(5),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: minAmountValue,
-                            icon: Icon(Icons.arrow_drop_down),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: TextStyle(color: Colors.black),
-                            underline: Container(
-                              height: 0,
-                              color: Colors.black,
-                            ),
-                            onChanged: (String newValue) {
-                              setState(() {
-                                minAmountValue = newValue;
-                              });
-                            },
-                            items: <String>[
-                              'Min Amount',
-                              '0',
-                              '10000',
-                              '100000'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
                           ),
                         ),
                         Container(
@@ -432,35 +383,13 @@ class _RentHousesState extends State<RentHouses> {
                               Radius.circular(20),
                             ),
                           ),
-                          padding: EdgeInsets.all(5),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: maxAmountValue,
-                            icon: Icon(Icons.arrow_drop_down),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: TextStyle(color: Colors.black),
-                            underline: Container(
-                              height: 0,
-                              color: Colors.black,
+                          padding: EdgeInsets.all(10),
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            controller: maxController,
+                            decoration: InputDecoration(
+                              hintText: "Max Amount"
                             ),
-                            items: <String>[
-                              'Max Amount',
-                              '1000',
-                              '10000',
-                              '100000'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (String newValue) {
-                              maxAmountValue = newValue;
-                              setState(() {
-                                maxAmountValue = newValue;
-                              });
-                            },
                           ),
                         ),
                         MaterialButton(

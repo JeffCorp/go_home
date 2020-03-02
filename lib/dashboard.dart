@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_home/views/testPicker.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -153,7 +154,8 @@ class _DashboardState extends State<Dashboard> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => InquiryForm()),
+                      // MaterialPageRoute(builder: (context) => InquiryForm()),
+                      MaterialPageRoute(builder: (context) => TestPicker()),
                     );
                   },
                   child: Container(
