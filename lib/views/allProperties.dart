@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:quiver/async.dart';
+import 'package:async/async.dart';
 
 import '../services/services.dart';
 import '../classes/property.dart';
@@ -37,6 +38,8 @@ class _AllPropertiesState extends State<AllProperties> {
     });
   }
 
+  final AsyncMemoizer _memoizer = AsyncMemoizer();
+
   List<Property> properties = List();
   List<Property> filteredProperties = List();
 
@@ -52,10 +55,10 @@ class _AllPropertiesState extends State<AllProperties> {
   bool isButtonDisabled;
   bool isInitFilter;
 
-  TextEditingController bathroomController =TextEditingController();
-  TextEditingController bedroomController =TextEditingController();
-  TextEditingController minController =TextEditingController();
-  TextEditingController maxController =TextEditingController();
+  TextEditingController bathroomController = TextEditingController();
+  TextEditingController bedroomController = TextEditingController();
+  TextEditingController minController = TextEditingController();
+  TextEditingController maxController = TextEditingController();
 
   final snackBar = SnackBar(
     content: Text('Please set the filter'),
@@ -72,40 +75,45 @@ class _AllPropertiesState extends State<AllProperties> {
     super.initState();
     startTimer();
     isButtonDisabled = true;
-    Services.getProperties().then((propertiesFromServer) {
-      setState(() {
-        properties = propertiesFromServer;
-        filteredProperties = properties;
-        print(properties);
+    this._memoizer.runOnce(() async {
+      Services.getProperties().then((propertiesFromServer) {
+        setState(() {
+          properties = propertiesFromServer;
+          filteredProperties = properties;
+          print(properties);
+        });
       });
     });
   }
 
-  Future<void> reload() async{
+  Future<void> reload() async {
     Navigator.pushReplacement(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => AllProperties()
-      ));
-      return null;
+        context, MaterialPageRoute(builder: (context) => AllProperties()));
+    return null;
   }
 
-   void filter() {
+  void filter() {
     setState(() {
       filteredProperties = properties
           .where((p) =>
               p.state.toLowerCase().contains(regionValue.toLowerCase()) &&
               p.propType.toLowerCase().contains(typeValue.toLowerCase()) &&
               p.status.toLowerCase().contains(statusValue.toLowerCase()) &&
-              p.bedroom.contains(bedroomController.text) &&
-              // int.parse(p.bathroom) == int.parse(bathroomValue)
-              p.bathroom.contains(bathroomController.text) &&
-              int.parse(p.amount) > int.parse(minController.text)&&
-              int.parse(p.amount) < int.parse(maxController.text))
+              (bedroomController.text.length != 0
+                  ? int.parse(p.bedroom) == int.parse(bedroomController.text)
+                  : int.parse(p.bedroom) > 0) &&
+              (bathroomController.text.length != 0
+                  ? int.parse(p.bathroom) == int.parse(bathroomController.text)
+                  : int.parse(p.bathroom) > 0) &&
+              (minController.text.length != 0
+                  ? int.parse(p.amount) > int.parse(minController.text)
+                  : int.parse(p.amount) > 0) &&
+              (maxController.text.length != 0
+                  ? int.parse(p.amount) < int.parse(maxController.text)
+                  : int.parse(p.amount) < 1000000000))
           .toList();
     });
   }
-
 
   Future<void> refresh() async {
     setState(() {
@@ -124,19 +132,18 @@ class _AllPropertiesState extends State<AllProperties> {
       ),
       body: filteredProperties.length < 1 && _current > 0
           ? Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Color(0xFF79c942),
-                )
-              )
+              child: CircularProgressIndicator(
+              backgroundColor: Color(0xFF79c942),
+            ))
           : filteredProperties.length < 1 && _current == 0
               ? RefreshIndicator(
-                onRefresh: reload,
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: double.infinity,
-                  child: Text("No result found. Please check your data connection !"),
-                )
-              )
+                  onRefresh: reload,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: double.infinity,
+                    child: Text(
+                        "No result found. Please check your data connection !"),
+                  ))
               : RefreshIndicator(
                   onRefresh: refresh,
                   child: Column(
@@ -376,23 +383,20 @@ class _AllPropertiesState extends State<AllProperties> {
                           ),
                         ),
                         Container(
-                          margin: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                width: 1,
-                                color: Colors.black45,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(20))),
-                          padding: EdgeInsets.all(10),
-                          child: TextFormField(
-                            keyboardType: TextInputType.number,
-                            controller: bedroomController,
-                            decoration: InputDecoration(
-                              hintText: "Bedrooms"
-                            ),
-                          )
-                        ),
+                            margin: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 1,
+                                  color: Colors.black45,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            padding: EdgeInsets.all(10),
+                            child: TextFormField(
+                              keyboardType: TextInputType.number,
+                              controller: bedroomController,
+                              decoration: InputDecoration(hintText: "Bedrooms"),
+                            )),
                         Container(
                           margin: EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -406,9 +410,7 @@ class _AllPropertiesState extends State<AllProperties> {
                           child: TextFormField(
                             keyboardType: TextInputType.number,
                             controller: bathroomController,
-                            decoration: InputDecoration(
-                              hintText: "Bathroom"
-                            ),
+                            decoration: InputDecoration(hintText: "Bathroom"),
                           ),
                         ),
                         Container(
@@ -424,9 +426,7 @@ class _AllPropertiesState extends State<AllProperties> {
                           child: TextFormField(
                             keyboardType: TextInputType.number,
                             controller: minController,
-                            decoration: InputDecoration(
-                              hintText: "Min Amount"
-                            ),
+                            decoration: InputDecoration(hintText: "Min Amount"),
                           ),
                         ),
                         Container(
@@ -444,9 +444,7 @@ class _AllPropertiesState extends State<AllProperties> {
                           child: TextFormField(
                             keyboardType: TextInputType.number,
                             controller: maxController,
-                            decoration: InputDecoration(
-                              hintText: "Max Amount"
-                            ),
+                            decoration: InputDecoration(hintText: "Max Amount"),
                           ),
                         ),
                         MaterialButton(

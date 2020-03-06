@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
+import 'package:share/share.dart';
 
 import './pills.dart';
 
@@ -249,7 +250,11 @@ class PropertyList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return GestureDetector(
+      onDoubleTap: (){
+        Share.share("https://www.gohome.ng/property-details.php?prop=10020");
+      },
+      child: Card(
       child: Container(
         height: 162.0,
         width: double.infinity,
@@ -428,6 +433,7 @@ class PropertyList extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }
