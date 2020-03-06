@@ -66,7 +66,7 @@ class _EachPropertyState extends State<EachProperty> {
       String url = 'https://www.gohome.ng/send_message.php';
       Map<String, String> headers = {"Content-type": "application/json"};
       String json =
-          '{"sender_id" : "${senderId}", "receiver_id" : "${receiverId}", "name" : "${name}", "email" : "${email}", "phone_no" : "${phone}", "title" : "${title}", "message" : "${message}", "prop_id" : "${item.prop_id}" }';
+          '{"sender_id" : "${senderId}", "receiver_id" : "${receiverId}", "name" : "${name}", "email" : "${email}", "phone_no" : "${phone}", "title" : "${title}", "message" : "${message}", "propId" : "${item.prop_id}", "sender" : ${senderId} }';
       // make POST request
       Response response = await post(url, headers: headers, body: json);
       // check the status code for the result

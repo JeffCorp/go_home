@@ -138,7 +138,7 @@ class _MessagesState extends State<Messages> {
     if (isAuthenticated) {
       response = await http.get(
           Uri.encodeFull(
-              "http://www.gohome.ng/get_message.php?receiver_id=" + user[0]),
+              "http://www.gohome.ng/get_message.php?receiver_id=${user[0]}&sender_no=${user[0]}"),
           headers: {"Accept": "application/json"});
       List userData;
       print(userData);
@@ -383,7 +383,7 @@ class _MessagesState extends State<Messages> {
                                   Navigator.push(
                                     context, 
                                     MaterialPageRoute(
-                                      builder: (context) => EachMessage()
+                                      builder: (context) => EachMessage(senderId: item["sender_id"], propId: item["propId"], img1: item["img1"],)
                                     ),
                                   );
                                 },
