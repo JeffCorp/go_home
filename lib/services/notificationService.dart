@@ -3,14 +3,12 @@ import 'package:http/http.dart' as http;
 import '../classes/property.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class FavoritesServices {
-  // static const String url = "https://www.gohome.ng/api/get_favorites_api.php?userId=";
+class NotificationServices {
 
-  static Future<List<Property>> getProperties() async{
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    List user = preferences.getStringList("user");
-    String url = "https://www.gohome.ng/api/get_favorites_api.php?userId=${user[1]}";
-    print(url);
+  static const String url = "http://www.gohome.ng/api/get_latest_property_api.php";
+
+
+   static Future<List<Property>> getProperties() async{
     try {
       final response =await http.get(url);
       if(response.statusCode == 200){
@@ -25,7 +23,8 @@ class FavoritesServices {
   }
 
   static List<Property> parseProperties(String responseBody){
-    final parsed =json.decode(responseBody).cast<Map<String, dynamic>>();
+    final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
     return parsed.map<Property>((json) => Property.fromJson(json)).toList();
   }
+
 }

@@ -111,6 +111,9 @@ class _EachPropertyState extends State<EachProperty> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    item.amount.length < 1 ?
+    a = "0"
+    :
     a = item.amount;
     fAmount = FlutterMoneyFormatter(amount: double.parse(a));
     imgToDisplay = item.img1;

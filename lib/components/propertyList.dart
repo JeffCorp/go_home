@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'package:share/share.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import './pills.dart';
 
@@ -38,54 +39,12 @@ class PropertyList extends StatelessWidget {
     this.goto,
   });
 
-//   @override
-//   State<StatefulWidget> createState() => _PropertyListState(
-//       id: id,
-//       amount: amount,
-//       location: location,
-//       propId: propId,
-//       region: region,
-//       state: state,
-//       imagePath: imagePath,
-//       saleOrRent: saleOrRent,
-//       title: title,
-//       phone: phone,
-//       name: name,
-//       email: email,
-//       goto: goto,);
-// }
 
-// class _PropertyListState extends State<PropertyList> {
-//   final String id;
-//   final String amount;
-//   final String location;
-//   final String propId;
-//   final String state;
-//   final String region;
-//   final String imagePath;
-//   final String saleOrRent;
-//   final String title;
-//   final String phone;
-//   final String name;
-//   final String email;
-//   final Widget goto;
+  // addToFavorites() async{
+  //   SharedPreferences preferences = await SharedPreferences.getInstance();
 
-//   _PropertyListState(
-//       {this.id,
-//       this.amount,
-//       this.location,
-//       this.propId,
-//       this.region,
-//       this.state,
-//       this.imagePath,
-//       this.saleOrRent,
-//       this.title,
-//       this.phone,
-//       this.name,
-//       this.email,
-//       this.goto,});
+  // }
 
-  // String a;
 
   void showSimpleCustomDialog(BuildContext context) {
     Dialog simpleDialog = Dialog(

@@ -149,33 +149,34 @@ class _AllPropertiesState extends State<AllProperties> {
                   child: Column(
                     children: <Widget>[
                       Container(
-                          child: Container(
-                        width: double.infinity,
-                        alignment: Alignment.topRight,
-                        child: MaterialButton(
-                            disabledColor: Colors.grey,
-                            color: Colors.white,
-                            elevation: 0,
-                            key: GlobalKey(debugLabel: "sca"),
-                            onPressed: () {
-                              setState(() {
-                                _settingModalBottomSheet(context);
-                              });
-                              print(filteredProperties);
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Icon(Icons.filter_list),
-                                Text(
-                                  "Filter",
-                                  style: TextStyle(
-                                    color: Color(0xFF79c942),
+                        child: Container(
+                          width: double.infinity,
+                          alignment: Alignment.topRight,
+                          child: MaterialButton(
+                              disabledColor: Colors.grey,
+                              color: Colors.white,
+                              elevation: 0,
+                              key: GlobalKey(debugLabel: "sca"),
+                              onPressed: () {
+                                setState(() {
+                                  _settingModalBottomSheet(context);
+                                });
+                                print(filteredProperties);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Icon(Icons.filter_list),
+                                  Text(
+                                    "Filter",
+                                    style: TextStyle(
+                                      color: Color(0xFF79c942),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            )),
-                      )),
+                                ],
+                              )),
+                        ),
+                      ),
                       filteredProperties.length > 0
                           ? Expanded(
                               child: ListView.builder(

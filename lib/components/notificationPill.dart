@@ -7,8 +7,10 @@ class NotificationPill extends StatelessWidget {
   final String title;
   final String time;
   final Widget goto;
+  final String propId;
+  final String imagePath;
 
-  NotificationPill({this.title, this.time, this.goto});
+  NotificationPill({this.title, this.time, this.goto, this.propId, this.imagePath});
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +29,15 @@ class NotificationPill extends StatelessWidget {
                   child: Row(
         children: <Widget>[
           CircleAvatar(
-            backgroundImage: AssetImage(
-              "assets/bul2_clear.jpg",
-            ),
+            child: Container(
+                          child: FadeInImage.assetNetwork(
+                            placeholder: "assets/bul2_clear.jpg",
+                            image: "http://gohome.ng/assets/upload/" +
+                            propId +
+                            "/" +
+                            imagePath,
+                          ),
+                        ),
             backgroundColor: Colors.white30,
             foregroundColor: Colors.white38,
             maxRadius: 30,
@@ -43,7 +51,7 @@ class NotificationPill extends StatelessWidget {
                 child: Text(title.length > 30 ? title.substring(0,30) + "\n" + title.substring(31,60): title, overflow: TextOverflow.visible, style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),),
               ),              
               Text("Check recommendations for you!"),
-              Text(time, style: TextStyle(fontWeight: FontWeight.w300),)
+              Text("New property update at $time", style: TextStyle(fontWeight: FontWeight.w300),)
             ],
           ),
           )

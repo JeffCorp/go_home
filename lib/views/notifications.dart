@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:go_home/services/notificationService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/notificationPill.dart';
@@ -35,7 +36,12 @@ class _NotificationState extends State<Notifications> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    NotificationServices.getProperties().then((propertiesFromServer) {
+        setState(() {
+          properties = propertiesFromServer;
+          filteredProperties = properties;
+        });
+      });
     // getLocation();
   }
 
@@ -61,7 +67,9 @@ class _NotificationState extends State<Notifications> {
                         final item = filteredProperties[index];
                         return NotificationPill(
                           title: item.title,
-                          time: "14:35",
+                          time: item.createdAt,
+                          propId: item.prop_id,
+                          imagePath: item.img1,
                           goto: EachProperty(item: item,),
                         );
                       })
