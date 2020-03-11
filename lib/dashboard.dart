@@ -155,7 +155,7 @@ class _DashboardState extends State<Dashboard> {
                     Navigator.push(
                       context,
                       // MaterialPageRoute(builder: (context) => InquiryForm()),
-                      MaterialPageRoute(builder: (context) => TestPicker()),
+                      MaterialPageRoute(builder: (context) => InquiryForm()),
                     );
                   },
                   child: Container(

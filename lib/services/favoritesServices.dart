@@ -12,6 +12,7 @@ class FavoritesServices {
     String url = "https://www.gohome.ng/api/get_favorites_api.php?userId=${user[1]}";
     print(url);
     try {
+      
       final response =await http.get(url);
       if(response.statusCode == 200){
         List<Property> list = parseProperties(response.body);

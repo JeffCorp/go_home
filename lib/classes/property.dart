@@ -32,6 +32,7 @@ class Property {
   String img15;
   String status;
   String createdAt;
+  bool isFav;
 
   Property(
       {this.id,
@@ -66,7 +67,8 @@ class Property {
       this.img13,
       this.img14,
       this.img15,
-      this.createdAt
+      this.createdAt,
+      this.isFav
       });
 
   factory Property.fromJson(Map<String, dynamic> json) {
@@ -103,7 +105,8 @@ class Property {
         img14: json['img14'] as String,
         img15: json['img15'] as String,
         status: json['status'] as String,
-        createdAt: json['created_at'] as String
+        createdAt: json['created_at'] as String,
+        isFav: json['isFav'] as bool
         );
   }
 

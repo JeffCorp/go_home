@@ -126,10 +126,12 @@ class _EachRequestState extends State<EachRequest> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: Text(title),),
+        appBar: AppBar(
+          title: Text(title),
+          backgroundColor: Color(0xFF79c942),
+          ),
         body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -179,15 +181,18 @@ class _EachRequestState extends State<EachRequest> {
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => EachMessage(),
+                                            builder: (context) => EachMessage(senderId: item["sender_id"], propId: item["propId"], img1: item["img1"],)
                                           ),
                                         );
                                       },
                                       child: InspectionView(
                                         id: item["id"],
                                         title: item["sender_name"],
-                                        requestQuestion: item["title"],
+                                        requestQuestion: item["propTitle"],
                                         followUp: item["message"],
+                                        imagePath: item["img1"],
+                                        location: item["location"],
+                                        propId: item["propId"],
                                       ),
                                     );
                                   },

@@ -216,6 +216,7 @@ class _FavoritesState extends State<Favorites> {
                                     state: filteredProperties[index].state,
                                     name: filteredProperties[index].name,
                                     email: filteredProperties[index].user_email,
+                                    isFav: true,
                                     goto: EachProperty(
                                       item: item,
                                     ),

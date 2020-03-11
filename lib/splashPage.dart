@@ -59,8 +59,9 @@ class _SplashPageState extends State<SplashPage> {
     return SplashScreen(
       seconds: 10,
       photoSize: 100.0,
+      imageBackground: new AssetImage('assets/bul2.jpg'),
       image: Image(
-        image: new AssetImage('assets/gohome.png'),
+        image: new AssetImage('assets/gohome_light.png'),
         alignment: Alignment.center,  
       ),
       

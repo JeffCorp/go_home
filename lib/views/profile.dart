@@ -198,7 +198,7 @@ class _ProfileState extends State<Profile> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => TestPicker(),
+                        builder: (context) => AddProperties(),
                       ),
                     );
                   },

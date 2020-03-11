@@ -1,13 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../classes/property.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FeaturedServices {
   static const String url = "https://www.gohome.ng/api/fetch_featured_api.php";
 
   static Future<List<Property>> getProperties() async{
     try {
-      final response =await http.get(url);
+      var response;
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+       if(preferences.getBool("isAuth")){
+         String userEmail =preferences.getStringList("user")[1];
+          response =await http.get(url + "?user_email=$userEmail");
+       }else{
+          response =await http.get(url);
+       }
+      
+      
       if(response.statusCode == 200){
         List<Property> list = parseProperties(response.body);
         return list;

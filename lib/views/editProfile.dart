@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:go_home/classes/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart';
 import 'package:quiver/async.dart';
@@ -119,24 +120,29 @@ class _EditProfileState extends State<EditProfile> {
       // this API passes back the id of the new item added to the body
       body = response.body;
 
-      Success success = Success.fromJson(jsonDecode(body));
-      if (success.status == "OK") {
-        debugPrint(success.message);
+      User user = User.fromJson(jsonDecode(body));
+      if (user.status == "OK") {
+        debugPrint(user.message);
+        shared_User.setBool("isAuth", true);
+        debugPrint(user.email);
         Map decode_options = jsonDecode(body);
         // String userData = user.email;
-        // shared_Success.setString('user', userData);
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => Dashboard(),
-        //   ),
-        // );
+        shared_User.setStringList('user', [
+          user.id,
+          user.email,
+          user.avatar,
+          user.name,
+          user.message,
+          user.password,
+          user.phone,
+          user.status
+        ]);
         setState(() {
           isLoading = false;
         });
         
       } else {
-        print('error connecting' + success.status);
+        print('error connecting' + user.status);
       }
       // debugPrint(user.toString());
     } else {
@@ -146,7 +152,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getUserDetails();
     retrieveLostData();

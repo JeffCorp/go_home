@@ -189,13 +189,13 @@ class _AllPropertiesState extends State<AllProperties> {
                                     location: filteredProperties[index].address,
                                     propId: filteredProperties[index].prop_id,
                                     region: filteredProperties[index].region,
-                                    saleOrRent:
-                                        filteredProperties[index].status,
+                                    saleOrRent: filteredProperties[index].status,
                                     title: filteredProperties[index].title,
                                     phone: filteredProperties[index].phone,
                                     state: filteredProperties[index].state,
                                     name: filteredProperties[index].name,
                                     email: filteredProperties[index].user_email,
+                                    isFav: filteredProperties[index].isFav,
                                     goto: EachProperty(
                                       item: item,
                                     ),

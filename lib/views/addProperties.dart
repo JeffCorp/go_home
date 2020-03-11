@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -7,8 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:go_home/classes/success.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quiver/async.dart';
-import 'package:flutter/services.dart';
-import 'dart:async';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
 import '../components/labelledInput.dart';
 
@@ -19,6 +21,7 @@ class AddProperties extends StatefulWidget {
 
 class _AddPropertiesState extends State<AddProperties> {
   Future<File> file;
+  List<Asset> images = List<Asset>();
 
   List user;
   String user_id, user_email;
@@ -65,8 +68,7 @@ class _AddPropertiesState extends State<AddProperties> {
     getUserDetails();
   }
 
-  static final String uploadEndPoint =
-      'https://gohome.ng/uploadProperty_image_api.php';
+  static final String uploadEndPoint = 'https://gohome.ng/uploadProperty_image_api.php';
   String status = '';
   String base64String;
   File tmpFile;
@@ -94,6 +96,36 @@ class _AddPropertiesState extends State<AddProperties> {
   List<File> tmpList = List();
 
   List bsList = [];
+
+  Future<void> loadAssets() async {
+    setState(() {
+      images = List<Asset>();
+    });
+
+    List<Asset> resultList;
+    String error;
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+          maxImages: 10,
+          enableCamera: true,
+          materialOptions: MaterialOptions(
+            actionBarColor: "#FF79c942",
+          ));
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+      // if (error == null) error = 'No Error Dectected';
+    });
+  }
 
   chooseImage() {
     setState(() {
@@ -176,8 +208,7 @@ class _AddPropertiesState extends State<AddProperties> {
 
       debugPrint(success.message);
       Map decode_options = jsonDecode(body);
-      http.post(uploadEndPoint,
-          body: {"image": base64String, "name": filename}).then((result) {
+      http.post(uploadEndPoint, body: {"image": base64String, "name": filename}).then((result) {
         setStatus(result.statusCode == 200 ? result.body : errMessage);
       }).catchError((error) {
         // setStatus(error.toString());
@@ -192,8 +223,7 @@ class _AddPropertiesState extends State<AddProperties> {
     return FutureBuilder<File>(
       future: file,
       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            null != snapshot.data) {
+        if (snapshot.connectionState == ConnectionState.done && null != snapshot.data) {
           tmpFile = snapshot.data;
           base64String = base64Encode(snapshot.data.readAsBytesSync());
           // return Container(
@@ -285,13 +315,8 @@ class _AddPropertiesState extends State<AddProperties> {
                                         propertyValue = newValue;
                                       });
                                     },
-                                    items: <String>[
-                                      'House',
-                                      'Office',
-                                      'Store',
-                                      'Land'
-                                    ].map<DropdownMenuItem<String>>(
-                                        (String value) {
+                                    items: <String>['House', 'Office', 'Store', 'Land']
+                                        .map<DropdownMenuItem<String>>((String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
                                         child: Text(value),
@@ -318,9 +343,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                         saleOrRent = newValue;
                                       });
                                     },
-                                    items: <String>['Sale', 'Rent']
-                                        .map<DropdownMenuItem<String>>(
-                                            (String value) {
+                                    items: <String>['Sale', 'Rent'].map<DropdownMenuItem<String>>((String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
                                         child: Text(value),
@@ -348,8 +371,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                       });
                                     },
                                     items: <String>['Bedroom', '1', '2', '3']
-                                        .map<DropdownMenuItem<String>>(
-                                            (String value) {
+                                        .map<DropdownMenuItem<String>>((String value) {
                                       return DropdownMenuItem<String>(
                                         value: value,
                                         child: Text(value),
@@ -394,10 +416,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     yesNo = newValue;
                                   });
                                 },
-                                items: <String>[
-                                  'Yes',
-                                  'No'
-                                ].map<DropdownMenuItem<String>>((String value) {
+                                items: <String>['Yes', 'No'].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
@@ -428,8 +447,7 @@ class _AddPropertiesState extends State<AddProperties> {
                     padding: EdgeInsets.all(10),
                     child: Column(
                       children: <Widget>[
-                        Text("Property Features",
-                            style: TextStyle(fontSize: 25)),
+                        Text("Property Features", style: TextStyle(fontSize: 25)),
                         Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
@@ -463,9 +481,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Balcony";
                                     this.setState(() {
                                       arr_check[1] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -490,9 +506,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Pet Friendly";
                                     this.setState(() {
                                       arr_check[2] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -512,9 +526,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Fire Alarm";
                                     this.setState(() {
                                       arr_check[3] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -539,9 +551,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Storage";
                                     this.setState(() {
                                       arr_check[4] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -561,9 +571,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Dryer";
                                     this.setState(() {
                                       arr_check[5] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -588,9 +596,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Heating";
                                     this.setState(() {
                                       arr_check[6] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -610,9 +616,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Pool";
                                     this.setState(() {
                                       arr_check[7] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -637,9 +641,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Laundry";
                                     this.setState(() {
                                       arr_check[8] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -659,9 +661,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Sauna";
                                     this.setState(() {
                                       arr_check[9] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -686,9 +686,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Gym";
                                     this.setState(() {
                                       arr_check[10] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -708,9 +706,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Elevator";
                                     this.setState(() {
                                       arr_check[11] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -734,9 +730,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Dish washer";
                                     this.setState(() {
                                       arr_check[12] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -756,9 +750,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     String val = "Emergency Exit";
                                     this.setState(() {
                                       arr_check[13] = value;
-                                      checkValue(val, features)
-                                          ? features.remove(val)
-                                          : features.add(val);
+                                      checkValue(val, features) ? features.remove(val) : features.add(val);
                                       print(features);
                                     });
                                   },
@@ -781,64 +773,64 @@ class _AddPropertiesState extends State<AddProperties> {
                 //   ),
                 // ),
 
-                OutlineButton(
-                  onPressed: chooseImage,
-                  child: Text("Choose Image"),
-                ),
-                // Card(
-                //   child:
-
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  padding: EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 20.0,
-                          ),
-                          showImage(),
-                          SizedBox(
-                            height: 20.0,
-                          ),
-                          // OutlineButton(
-                          //   onPressed: null,
-                          //   child: Text("Upload Image"),
-                          // ),
-                          Text(
-                            // status.length > 0 ?
-                            // status.substring(0,20)
-                            // :
-                            status,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 20.0,
+                Builder(
+                  builder: (context) {
+                    if (images?.isEmpty ?? true) {
+                      return FlatButton(
+                        onPressed: loadAssets,
+                        child: Container(
+                          height: 200,
+                          child: Center(
+                            child: SizedBox(
+                              child: Text(
+                                'Choose Image',
+                                style: TextStyle(
+                                  color: Colors.black38,
+                                ),
+                              ),
                             ),
                           ),
-                        ],
+                        ),
+                      );
+                    }
+                    return SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        itemCount: images.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (BuildContext context, int index) {
+                          Asset asset = images[index];
+                          showBase64(images[1]);
+                          return Stack(
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.only(right: 20),
+                                child: AssetThumb(
+                                  asset: asset,
+                                  width: 200,
+                                  height: 200,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.close,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    images.removeWhere((_asset) => _asset == asset);
+                                  });
+                                },
+                              )
+                            ],
+                          );
+                        },
                       ),
-                      // Column(
-                      //   children: <Widget>[
-                      //     Container(
-                      //       child: IconButton(
-                      //         onPressed: null,
-                      //         icon: Icon(
-                      //           Icons.add,
-                      //           size: 45,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     Text("Add Images"),
-                      //   ],
-                      // )
-                    ],
-                  ),
+                    );
+                  },
                 ),
+
                 // ),
                 Card(
                   child: Container(
@@ -872,12 +864,8 @@ class _AddPropertiesState extends State<AddProperties> {
                                     stateValue = newValue;
                                   });
                                 },
-                                items: <String>[
-                                  'Lagos',
-                                  'Abuja',
-                                  'Imo',
-                                  'Port Harcourt'
-                                ].map<DropdownMenuItem<String>>((String value) {
+                                items: <String>['Lagos', 'Abuja', 'Imo', 'Port Harcourt']
+                                    .map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
@@ -900,12 +888,7 @@ class _AddPropertiesState extends State<AddProperties> {
                                     lgaValue = newValue;
                                   });
                                 },
-                                items: <String>[
-                                  'Any LGA',
-                                  '',
-                                  '',
-                                  ''
-                                ].map<DropdownMenuItem<String>>((String value) {
+                                items: <String>['Any LGA', '', '', ''].map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(value),
@@ -918,7 +901,11 @@ class _AddPropertiesState extends State<AddProperties> {
                               ),
                               MaterialButton(
                                 color: Color(0xFF79c942),
-                                onPressed: startUpload,
+                                onPressed: (){
+                                  startUpload();
+                                  // print(images.);
+                                  
+                                },
                                 child: Text("Submit"),
                               )
                             ],
@@ -934,5 +921,12 @@ class _AddPropertiesState extends State<AddProperties> {
         ),
       ),
     );
+  }
+
+  showBase64(Asset asset) async{
+    ByteData bytes = await asset.getByteData(quality: 100);
+    var buffer = bytes.buffer;
+    var m = base64.encode(Uint8List.view(buffer));
+    print(m);
   }
 }
