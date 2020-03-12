@@ -801,7 +801,7 @@ class _AddPropertiesState extends State<AddProperties> {
                             width: 5.0,
                           ),
                           Text(
-                            'Add Image',
+                            'Choose Property Images',
                             style: TextStyle(color: buttonColor),
                           )
                         ],
