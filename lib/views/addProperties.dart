@@ -4,6 +4,9 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
+
+import 'dart:async';
+import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:go_home/classes/success.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:quiver/async.dart';
@@ -17,7 +20,8 @@ class AddProperties extends StatefulWidget {
 
 class _AddPropertiesState extends State<AddProperties> {
   Future<File> file;
-
+  List<Asset> images = List<Asset>();
+  String _error = 'No Error Dectected';
   List user;
   String user_id, user_email;
 
@@ -186,48 +190,45 @@ class _AddPropertiesState extends State<AddProperties> {
     }
   }
 
-  Widget showImage() {
-    return FutureBuilder<File>(
-      future: file,
-      builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-        if (snapshot.connectionState == ConnectionState.done &&
-            null != snapshot.data) {
-          tmpFile = snapshot.data;
-          base64String = base64Encode(snapshot.data.readAsBytesSync());
-          // return Container(
-          //   child: Text(snapshot.data.toString())
-          // );
-          return Flexible(
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: Image.file(
-                snapshot.data,
-                fit: BoxFit.fill,
-                width: MediaQuery.of(context).size.width * 0.5,
-                height: 200,
-              ),
-            ),
-          );
-        } else if (null != snapshot.error) {
-          return const Text(
-            "Error selecting image",
-            textAlign: TextAlign.center,
-          );
-        } else {
-          return const Text(
-            "No image found",
-            textAlign: TextAlign.center,
-          );
-        }
-      },
-    );
-    //  }
-    // );
+
+
+  Future<void> loadAssets() async {
+    List<Asset> resultList = List<Asset>();
+    String error = 'No Error Dectected';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 300,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Example App",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      images = resultList;
+      _error = error;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     bool is_checked = true;
+    final buttonColor = Theme.of(context).primaryColor;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -289,12 +290,12 @@ class _AddPropertiesState extends State<AddProperties> {
                                       'Store',
                                       'Land'
                                     ].map<DropdownMenuItem<String>>(
-                                        (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
+                                            (String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
                                   ),
                                 ],
                               ),
@@ -319,11 +320,11 @@ class _AddPropertiesState extends State<AddProperties> {
                                     items: <String>['Sale', 'Rent']
                                         .map<DropdownMenuItem<String>>(
                                             (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
                                   ),
                                 ],
                               ),
@@ -348,11 +349,11 @@ class _AddPropertiesState extends State<AddProperties> {
                                     items: <String>['Bedroom', '1', '2', '3']
                                         .map<DropdownMenuItem<String>>(
                                             (String value) {
-                                      return DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(value),
-                                      );
-                                    }).toList(),
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Text(value),
+                                          );
+                                        }).toList(),
                                   ),
                                 ],
                               )
@@ -779,64 +780,37 @@ class _AddPropertiesState extends State<AddProperties> {
                 //   ),
                 // ),
 
-                OutlineButton(
-                  onPressed: chooseImage,
-                  child: Text("Choose Image"),
-                ),
-                // Card(
-                //   child:
+                Column(
+                  children: <Widget>[
+                    Center(child: Text('Error: $_error')),
+                    OutlineButton(
+                      borderSide: BorderSide(
+                        color: buttonColor,
+                        width: 2.0,
+                      ),
+                      onPressed: loadAssets,
 
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.5,
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  padding: EdgeInsets.all(10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          SizedBox(
-                            height: 20.0,
+                          Icon(
+                            Icons.camera_alt,
+                            color: buttonColor,
                           ),
-                          showImage(),
                           SizedBox(
-                            height: 20.0,
+                            width: 5.0,
                           ),
-                          // OutlineButton(
-                          //   onPressed: null,
-                          //   child: Text("Upload Image"),
-                          // ),
                           Text(
-                            // status.length > 0 ?
-                            // status.substring(0,20)
-                            // :
-                            status,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.green,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 20.0,
-                            ),
-                          ),
+                            'Add Image',
+                            style: TextStyle(color: buttonColor),
+                          )
                         ],
                       ),
-                      // Column(
-                      //   children: <Widget>[
-                      //     Container(
-                      //       child: IconButton(
-                      //         onPressed: null,
-                      //         icon: Icon(
-                      //           Icons.add,
-                      //           size: 45,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     Text("Add Images"),
-                      //   ],
-                      // )
-                    ],
-                  ),
+                    ),
+
+                  ],
                 ),
+
                 // ),
                 Card(
                   child: Container(
