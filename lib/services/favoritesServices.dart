@@ -1,12 +1,18 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../classes/property.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Services {
-  static const String url = "http://www.gohome.ng/get_all_api.php";
+class FavoritesServices {
+  // static const String url = "https://www.gohome.ng/api/get_favorites_api.php?userId=";
 
   static Future<List<Property>> getProperties() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    List user = preferences.getStringList("user");
+    String url = "https://www.gohome.ng/api/get_favorites_api.php?userId=${user[1]}";
+    print(url);
     try {
+      
       final response =await http.get(url);
       if(response.statusCode == 200){
         List<Property> list = parseProperties(response.body);

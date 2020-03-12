@@ -31,6 +31,8 @@ class Property {
   String img14;
   String img15;
   String status;
+  String createdAt;
+  bool isFav;
 
   Property(
       {this.id,
@@ -64,7 +66,10 @@ class Property {
       this.img12,
       this.img13,
       this.img14,
-      this.img15});
+      this.img15,
+      this.createdAt,
+      this.isFav
+      });
 
   factory Property.fromJson(Map<String, dynamic> json) {
     return Property(
@@ -99,11 +104,14 @@ class Property {
         img13: json['img13'] as String,
         img14: json['img14'] as String,
         img15: json['img15'] as String,
-        status: json['status'] as String);
+        status: json['status'] as String,
+        createdAt: json['created_at'] as String,
+        isFav: json['isFav'] as bool
+        );
   }
 
   @override
   String toString() {
-    return '{ ${this.amount}, ${this.phone}, ${this.name}, ${this.title}, ${this.status} }';
+    return '{ ${this.amount}, ${this.phone}, ${this.name}, ${this.title}, ${this.status}, $createdAt }';
   }
 }

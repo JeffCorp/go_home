@@ -132,6 +132,7 @@ class _SaleHousesState extends State<SaleHouses> {
                           state: filteredProperties[index].state,
                           name: filteredProperties[index].name,
                           email: filteredProperties[index].user_email,
+                          isFav: filteredProperties[index].isFav,
                           goto: EachProperty(
                             item: item,
                           ),

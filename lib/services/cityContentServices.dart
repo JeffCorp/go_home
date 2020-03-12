@@ -10,7 +10,15 @@ class CityContentServices {
 
    static Future<List<Property>> getProperties() async{
     try {
-      final response =await http.get(url);
+      var response;
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+       if(preferences.getBool("isAuth")){
+         String userEmail =preferences.getStringList("user")[1];
+          response =await http.get(url + "?user_email=$userEmail");
+       }else{
+          response =await http.get(url);
+       }
+      
       if(response.statusCode == 200){
         List<Property> list = parseProperties(response.body);
         return list;

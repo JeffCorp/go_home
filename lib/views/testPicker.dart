@@ -1,45 +1,110 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-// import 'package:flutter_multiple_image_picker/flutter_multiple_image_picker.dart';
+import 'dart:async';
 import 'dart:io';
+import 'dart:convert';
+
+import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
+import 'package:storage_path/storage_path.dart';
 
 class TestPicker extends StatefulWidget {
   @override
-  _TestPickerState createState() => _TestPickerState();
+  _TestPickerState createState() => new _TestPickerState();
 }
 
 class _TestPickerState extends State<TestPicker> {
-  BuildContext context;
-  String _platformMessage = 'No Error';
-  List images;
-  int maxImageNo = 10;
-  bool selectSingleImage = false;
+  List<Asset> images = List<Asset>();
+  String _error = 'No Error Dectected';
+  String file;
+  String base64String;
+  String imagePath;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
+    getImagePath("imgName");
   }
 
-  initMultiPickUp() async {
-    setState(() {
-      images = null;
-      _platformMessage = 'No Error';
-    });
-    List resultList;
-    String error;
-    // try {
-    //   resultList = await FlutterMultipleImagePicker.pickMultiImages(
-    //       maxImageNo, selectSingleImage);
-    // } on Exception catch (e) {
-    //   error = e.toString();
-    // }
+  Widget buildGridView() {
+    return GridView.count(
+      crossAxisCount: 3,
+      children: List.generate(images.length, (index) {
+        Asset asset = images[index];
+        return AssetThumb(
+          asset: asset,
+          width: 300,
+          height: 300,
+        );
+      }),
+    );
+  }
 
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  Future<void> loadAssets() async {
+    List<Asset> resultList = List<Asset>();
+    String error = 'No Error Dectected';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 300,
+        enableCamera: true,
+        selectedAssets: images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#abcdef",
+          actionBarTitle: "Example App",
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+          selectCircleStrokeColor: "#000000",
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
       images = resultList;
-      if (error == null) _platformMessage = 'No Error Dectected';
+      _error = error;
+      file = resultList[0].name;
     });
+
+    print(getImagePath(resultList[0].name));
+  }
+
+
+
+  getImagePath(String imgName) async{
+    try {
+      imagePath = await StoragePath.imagesPath; //contains images path and folder name in json format
+    } on Exception {
+      imagePath = 'Failed to get path';
+    }
+
+
+    Directory tempDir = await getTemporaryDirectory();
+String tempPath = tempDir.path;
+
+Directory appDocDir = await getApplicationDocumentsDirectory();
+String appDocPath = appDocDir.path;
+
+    print(tempPath + ", " + appDocPath);
+
+    return imagePath;
   }
 
   @override
@@ -47,49 +112,62 @@ class _TestPickerState extends State<TestPicker> {
     return new MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
-          title: new Text('Multi-image picker plugin'),
+          title: const Text('Plugin example app'),
         ),
-        body: new Container(
-          padding: const EdgeInsets.all(8.0),
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              images == null
-                  ? new Container(
-                      height: 300.0,
-                      width: 400.0,
-                      child: new Icon(
-                        Icons.image,
-                        size: 250.0,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    )
-                  : new SizedBox(
-                      height: 300.0,
-                      width: 400.0,
-                      child: new ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (BuildContext context, int index) =>
-                            new Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: new Image.file(
-                                new File(images[index].toString()),
-                              ),
-                            ),
-                        itemCount: images.length,
+        body: Column(
+          children: <Widget>[
+            Center(child: Text('Error: $_error')),
+            RaisedButton(
+              child: Text("Pick images"),
+              onPressed: loadAssets,
+            ),
+            Expanded(
+              child: buildGridView(),
+            ),
+            RaisedButton(
+                onPressed: () async => showDialog(
+                      context: context,
+                      builder: (_) => Container(
+                        child: FutureBuilder(
+                          future: getImageFileFromAssets(file),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<File> snapshot) {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                null != snapshot.data) {
+                              base64String =
+                                  base64Encode(snapshot.data.readAsBytesSync());
+                              // return Container(
+                              //   child: Text(snapshot.data.toString())
+                              // );
+                              return Flexible(
+                                child: Container(
+                                  padding: EdgeInsets.all(20),
+                                  child: Image.file(
+                                    snapshot.data,
+                                    fit: BoxFit.fill,
+                                    width:100,
+                                    height: 200,
+                                  ),
+                                ),
+                              );
+                            } else if (null != snapshot.error) {
+                              return Text(
+                                snapshot.error.toString(),
+                                textAlign: TextAlign.center,
+                              );
+                            } else {
+                              return const Text(
+                                "No image found",
+                                textAlign: TextAlign.center,
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ),
-              new Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: new Text('Error Dectected: $_platformMessage'),
-              ),
-              new RaisedButton.icon(
-                  onPressed: initMultiPickUp,
-                  icon: new Icon(Icons.image),
-                  label: new Text("Pick-Up Images")),
-            ],
-          ),
+                child: Text('Show Image'))
+          ],
         ),
       ),
     );

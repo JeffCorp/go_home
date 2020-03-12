@@ -56,7 +56,7 @@ class _InspectionRequestState extends State<InspectionRequest> {
     if (isAuthenticated) {
       response = await http.get(
           Uri.encodeFull(
-              "http://www.gohome.ng/get_message.php?receiver_id=" + user[0]),
+              "http://www.gohome.ng/get_message.php?receiver_id=${user[0]}&sender_no=${user[0]}"),
           headers: {"Accept": "application/json"});
       List userData;
       print(userData);
@@ -117,13 +117,13 @@ class _InspectionRequestState extends State<InspectionRequest> {
     super.initState();
     startTimer();
     isAuthValid();
-    MessageServices.getMessages().then((propertiesFromServer){
-      setState(() {
-        packedMessage = propertiesFromServer;
-        _packedMessage =packedMessage;
-        // print(packedMessage);
-      });
-    });
+    // MessageServices.getMessages().then((propertiesFromServer){
+    //   setState(() {
+    //     packedMessage = propertiesFromServer;
+    //     _packedMessage =packedMessage;
+    //     // print(packedMessage);
+    //   });
+    // });
     
   }
 
